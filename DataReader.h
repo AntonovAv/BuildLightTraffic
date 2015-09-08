@@ -19,22 +19,29 @@ public:
 private:
 
 	unsigned int hexToDec(String hexString);
+	char handleNextCharWithIPD(char c);
+	char handleNextCharWithChunked(char c);
 
 	String responseHeader;
 
 	byte state;
+	byte chunkedState;
 
 	static const byte FIND_LEN = 0;
 	static const byte READ_LEN = 1;
 	static const byte READ_DATA = 2;
 	static const byte READ_HEADER = 3;
 
+	static const byte READ_CHUNKED_LEN = 0;
+	static const byte READ_CHUNKED_DATA = 1;
+	static const byte ESCAPE_END_CHUNKED_DATA = 2;
+
 	boolean isReadHeader = false; // if header already read
 	boolean isChunked = false;  // if data encoding is chuncked
 
-	String CHUNCKED_TEMPLATE = "chunked";
+	String CHUNKED_TEMPLATE = "chunked";
 	String IPD_COM_TEMPLATE = "+IPD,";
-	String END_OF_HEADER_TEMPLATE = "GMT\r\n";
+	String END_OF_HEADER_TEMPLATE = "\r\n\r\n";
 
 	int char_count; // temp counter when need to find string
 

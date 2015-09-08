@@ -6,7 +6,7 @@
 
 extern DataReader_ DataReader;
 
-char DataReader_::handleNextChar(char c) {
+char DataReader_::handleNextCharWithIPD(char c) {
 	switch (state) {
 		// find marker to read lenght of part of message
 	case FIND_LEN:
@@ -39,56 +39,80 @@ char DataReader_::handleNextChar(char c) {
 	case READ_DATA:
 		data_len -= 1; // read next char
 		if (-1 < data_len) {
-			/***************************************************/
-			if (false == isReadHeader) { // if not read header
-				responseHeader += c;
-				if (END_OF_HEADER_TEMPLATE.charAt(char_count) == c) {
-					char_count += 1;
-					if (char_count == END_OF_HEADER_TEMPLATE.length()) {
-						char_count = 0;
-						isReadHeader = true;
-						if (responseHeader.indexOf(CHUNCKED_TEMPLATE) != -1) {
-							isChunked = true;
-						}
-					}
-				}
-				else {
-					char_count = 0;
-					if (END_OF_HEADER_TEMPLATE.charAt(char_count) == c) {
-						char_count += 1;
-					}
-				}
-			}
-			else {
-				if (true == isChunked) { // if data encoding is chuncked 
-					chunked_data_len -= 1; // read next chuncked char
-					if (-1 < chunked_data_len) {
-						return c; // raw data without chuncked
-					}
-					else {  // read chuncked data  len
-						char_count += 1; // skip first \r\n characters
-						if (char_count > 2) {
-							if (c == '\n') {
-								chunked_data_len_not_parse.trim();// delete \r\n characters 
-								chunked_data_len = hexToDec(chunked_data_len_not_parse); // convert lenght to int
-								chunked_data_len_not_parse = "";
-							}
-							else {
-								chunked_data_len_not_parse += c;
-							}
-						}
-					}
-				}
-				else {
-					return c; // data if encoding is not chuncked
-				}
-			}
-			/*************************************************/
+			return c;
 		}
 		else {
 			state = FIND_LEN;
 		}
 		break;
+	}
+	return -1;
+}
+
+char DataReader_::handleNextCharWithChunked(char c) {
+	switch (chunkedState) {
+
+	case READ_CHUNKED_LEN:
+		if (c == '\n') {
+			chunked_data_len_not_parse.trim(); // delete \r\n characters 
+			chunked_data_len = hexToDec(chunked_data_len_not_parse); // convert lenght to int
+			chunked_data_len_not_parse = "";
+			chunkedState = READ_CHUNKED_DATA;
+		}
+		else {
+			chunked_data_len_not_parse += c;
+		}
+		break;
+	case READ_CHUNKED_DATA:
+		chunked_data_len -= 1;
+		if (-1 < chunked_data_len) { // first tine data_len == 0 -> go to read len 
+			return c; // raw data without chuncked
+		}
+		else {
+			char_count += 1; // escape \r\n last chars in chuncked data
+			if (char_count > 1) {
+				char_count = 0;
+				chunkedState = READ_CHUNKED_LEN;
+			}
+		}
+		break;
+	}
+	return -1;
+}
+
+char DataReader_::handleNextChar(char c) {
+	c = handleNextCharWithIPD(c);
+	if (-1 == c) {
+		return -1;
+	}
+
+	if (false == isReadHeader) { // if not read header
+		responseHeader += c;
+		if (END_OF_HEADER_TEMPLATE.charAt(char_count) == c) {
+			char_count += 1;
+			if (char_count == END_OF_HEADER_TEMPLATE.length()) {
+				char_count = 0;
+				isReadHeader = true;
+				if (responseHeader.indexOf(CHUNKED_TEMPLATE) != -1) {
+					isChunked = true;
+					chunkedState = READ_CHUNKED_LEN;
+				}
+			}
+		}
+		else {
+			char_count = 0;
+			if (END_OF_HEADER_TEMPLATE.charAt(char_count) == c) {
+				char_count += 1;
+			}
+		}
+	}
+	else {
+		if (true == isChunked) { // if data encoding is chucked 
+			return handleNextCharWithChunked(c);
+		}
+		else {
+			return c; // data if encoding is not chunked
+		}
 	}
 	return -1;
 }

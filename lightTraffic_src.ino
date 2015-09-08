@@ -20,7 +20,7 @@ const String PORT = "8088";
 const String WIFI_NAME = "internet";
 const String WIFI_PASS = "654qwerty123";
 
-DataReader_ DataReader;
+DataReader_ DataReader; // instanse of data reader
 
 void esp_reset() {
   digitalWrite(ESP_RESET, LOW);
