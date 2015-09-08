@@ -43,11 +43,11 @@ String exec(String command, int pause = 1000, boolean needReturn = true) {
   }
 }
   
-void exec_big_data(String* keys, int nKeys, String command) {
+void exec_big_data( String command ) {
 	// debug output:
 	Serial.println("<send>" + command + "</send>");
 	Serial1.print(command);
-	// init state is find lenght
+
 	DataReader.initRead();
 	int time = 20000;
 	while (time > 0) {
@@ -76,8 +76,8 @@ String esp_get(String query) {
   String header = "GET " + query + " HTTP/1.1\r\n" + "HOST: " + SERVER_IP + "\r\n\r\n";
   resp = exec("AT+CIPSEND=" + String(header.length()) + "\r\n");
   if (resp.indexOf(">") == -1) return "<error2>" + resp + "</error2>";
-  String mass[] = {"id"};
-  exec_big_data(mass, 1, header);
+
+  exec_big_data(header);
 }
 
 enum main_states { FIRST_RUN, WAIT_A_MINUTE, WAIT_ESP_ANSWER, TEST_ESP_OK };
