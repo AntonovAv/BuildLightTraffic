@@ -1,3 +1,4 @@
+#include "JSONDataParser.h"
 #include "DataReader.h"
 #include <TimerOne.h>
 
@@ -21,6 +22,7 @@ const String WIFI_NAME = "internet";
 const String WIFI_PASS = "654qwerty123";
 
 DataReader_ DataReader; // instanse of data reader
+JSONDataParser_ DataParser;
 
 void esp_reset() {
   digitalWrite(ESP_RESET, LOW);
@@ -49,19 +51,29 @@ void exec_big_data( String command ) {
 	Serial1.print(command);
 
 	DataReader.initRead();
+	String tokens[1] = { "id" };
+	DataParser.initParser(tokens, 1, 10);
+
 	int time = 20000;
 	while (time > 0) {
 		while (Serial1.available() > 0) {
 			char c = Serial1.read();
 			c = DataReader.handleNextChar(c);
 			if (-1 != c) {
-				Serial.write(c);
+			//	Serial.write(c);
+				DataParser.parseNextChar(c);
 			}
 		}
 		time -= 1;
 		delay(1);
 	}
+	
+	for (int i = 0; i < 10; i++) {
+		String cur = DataParser.getResultData()[0][i];
+		Serial.println(cur);
+	}
 	Serial.print(DataReader.getLastHeader());
+	
 }
 
 

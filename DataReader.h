@@ -34,7 +34,6 @@ private:
 
 	static const byte READ_CHUNKED_LEN = 0;
 	static const byte READ_CHUNKED_DATA = 1;
-	static const byte ESCAPE_END_CHUNKED_DATA = 2;
 
 	boolean isReadHeader = false; // if header already read
 	boolean isChunked = false;  // if data encoding is chuncked
