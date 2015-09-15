@@ -11,18 +11,21 @@
 
 class DataReader_ {
 public:
-	void initRead();
+	void initRead(boolean isNeedHeader);
 	// handle next char (return -1 if char is not data or char if it is data)
-	char handleNextChar(char c);
-	String getLastHeader();
+	char handleNextChar(char &c);
+	void clearMemory();
+	String & getLastHeader();
 
 private:
 
-	unsigned int hexToDec(String hexString);
-	char handleNextCharWithIPD(char c);
-	char handleNextCharWithChunked(char c);
+	unsigned int hexToDec(String &hexString);
+	char handleNextCharWithIPD(char &c);
+	char handleNextCharWithChunked(char &c);
 
-	String responseHeader;
+	String lastResponseHeader;
+	String* tempHeader;
+	boolean saveHeader;
 
 	byte state;
 	byte chunkedState;

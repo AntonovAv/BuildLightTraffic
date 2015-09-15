@@ -4,9 +4,8 @@
 
 #include "DataReader.h"
 
-extern DataReader_ DataReader;
 
-char DataReader_::handleNextCharWithIPD(char c) {
+char DataReader_::handleNextCharWithIPD(char &c) {
 	switch (state) {
 		// find marker to read lenght of part of message
 	case FIND_LEN:
@@ -49,7 +48,7 @@ char DataReader_::handleNextCharWithIPD(char c) {
 	return -1;
 }
 
-char DataReader_::handleNextCharWithChunked(char c) {
+char DataReader_::handleNextCharWithChunked(char &c) {
 	switch (chunkedState) {
 
 	case READ_CHUNKED_LEN:
@@ -80,23 +79,29 @@ char DataReader_::handleNextCharWithChunked(char c) {
 	return -1;
 }
 
-char DataReader_::handleNextChar(char c) {
+char DataReader_::handleNextChar(char &c) {
 	c = handleNextCharWithIPD(c);
 	if (-1 == c) {
 		return -1;
 	}
 
 	if (false == isReadHeader) { // if not read header
-		responseHeader += c;
+		(*tempHeader) += c;
 		if (END_OF_HEADER_TEMPLATE.charAt(char_count) == c) {
 			char_count += 1;
 			if (char_count == END_OF_HEADER_TEMPLATE.length()) {
 				char_count = 0;
-				isReadHeader = true;
-				if (responseHeader.indexOf(CHUNKED_TEMPLATE) != -1) {
+						
+				if ((*tempHeader).indexOf(CHUNKED_TEMPLATE) != -1) {
 					isChunked = true;
 					chunkedState = READ_CHUNKED_LEN;
 				}
+
+				if (!saveHeader) {
+					delete tempHeader; // release memory
+				}
+				isReadHeader = true;
+				// need to implement return header
 			}
 		}
 		else {
@@ -117,7 +122,7 @@ char DataReader_::handleNextChar(char c) {
 	return -1;
 }
 
-unsigned int DataReader_::hexToDec(String hexString) {
+unsigned int DataReader_::hexToDec(String &hexString) {
 
 	unsigned int decValue = 0;
 	int nextInt;
@@ -136,17 +141,19 @@ unsigned int DataReader_::hexToDec(String hexString) {
 	return decValue;
 }
 
-void DataReader_::initRead(void) {
+void DataReader_::initRead(boolean isNeedHeader) {
+	saveHeader = isNeedHeader;
 	char_count = 0;
 	isReadHeader = false;
 	isChunked = false;
 	state = FIND_LEN;
 	data_len = 0;
 	chunked_data_len = 0;
-	responseHeader = "";
+	tempHeader = new String;
 }
 
 
-String DataReader_::getLastHeader() {
-	return responseHeader;
+
+String & DataReader_::getLastHeader() {
+	return lastResponseHeader;
 }

@@ -49,18 +49,27 @@ void exec_big_data( String command ) {
 	// debug output:
 	Serial.println("<send>" + command + "</send>");
 	Serial1.print(command);
+	Serial.println("Before init reader: ");
+	Serial.println(freeRam());
 
-	DataReader.initRead();
-	String tokens[1] = { "id" };
-	DataParser.initParser(tokens, 1, 10);
+	DataReader.initRead(false);
 
-	int time = 20000;
+	Serial.println("After init reader: ");
+	Serial.println(freeRam());
+	Serial.println("Before init parser: ");
+	String tokens[2] = { "count", "id" };
+	byte length[2] = { 1, 20 };
+	Serial.println(freeRam());
+	DataParser.initParser(tokens, 2, length);
+	Serial.println("After init parser: ");
+	Serial.println(freeRam());
+	int time = 5000;
 	while (time > 0) {
 		while (Serial1.available() > 0) {
 			char c = Serial1.read();
 			c = DataReader.handleNextChar(c);
 			if (-1 != c) {
-			//	Serial.write(c);
+				//Serial.write(c);
 				DataParser.parseNextChar(c);
 			}
 		}
@@ -68,10 +77,15 @@ void exec_big_data( String command ) {
 		delay(1);
 	}
 	
-	for (int i = 0; i < 10; i++) {
-		String cur = DataParser.getResultData()[0][i];
-		Serial.println(cur);
+	Serial.println((*DataParser.getResultData()[0][0]));
+	for (int i = 0; i < DataParser.getLengthOfDataResults()[1]; i++) {
+		Serial.println((*DataParser.getResultData()[1][i]));
 	}
+	Serial.println("After parse: ");
+	Serial.println(freeRam());
+	DataParser.clearMemory();
+	Serial.println("After clear: ");
+	Serial.println(freeRam());
 	Serial.print(DataReader.getLastHeader());
 	
 }
@@ -89,7 +103,12 @@ String esp_get(String query) {
   resp = exec("AT+CIPSEND=" + String(header.length()) + "\r\n");
   if (resp.indexOf(">") == -1) return "<error2>" + resp + "</error2>";
 
+  Serial.println("Before execBig: ");
+  Serial.println(freeRam());
   exec_big_data(header);
+  Serial.println(F("After execBig: "));
+  Serial.println(freeRam());
+  
 }
 
 enum main_states { FIRST_RUN, WAIT_A_MINUTE, WAIT_ESP_ANSWER, TEST_ESP_OK };
@@ -164,6 +183,14 @@ void parse_build_types() {
 
 void wifi_setup(){
   exec("AT+CWJAP=\"" + WIFI_NAME + "\",\"" + WIFI_PASS + "\"\r\n",5000);
+}
+
+
+int freeRam()
+{
+	extern int __heap_start, *__brkval;
+	int v;
+	return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
 }
 
 void setup() {

@@ -12,22 +12,23 @@
 class JSONDataParser_ {
 public:
 
-	void initParser(String* tokens, int nTokens, int maxLengthDataSize);
+	void initParser(String* tokens, int nTokens, byte* maxLengthDataSize);
 
 	void clearMemory();
 
 	void parseNextChar(char &c);
 	int* getLengthOfDataResults();
-	String** getResultData();
+	String*** getResultData();
 
 private:
 
-	String* extendDataArray(String* oldArray, String newData);
+	void extendResultsArray(int nOfToken, byte n);
 
 	String* tokensForFind;
 	int *resultLengths;
+	byte* maxDataLengths;
 	int* charCounters;
-	String** results;
+	String*** results;
 	int numberOfTokens;
 
 	int nOfTokenForReadData = -1;
