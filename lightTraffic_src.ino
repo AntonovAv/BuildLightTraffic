@@ -1,6 +1,7 @@
 #include "JSONDataParser.h"
 #include "DataReader.h"
 #include <TimerOne.h>
+#include <eeprom.h>
 
 #define RED 6
 #define YELLOW 5
@@ -81,13 +82,42 @@ void exec_big_data( String command ) {
 	for (int i = 0; i < DataParser.getLengthOfDataResults()[1]; i++) {
 		Serial.println((*DataParser.getResultData()[1][i]));
 	}
+	//updateBuildIdsInEEPROM(DataParser.getResultData()[1], DataParser.getLengthOfDataResults()[1]);
 	Serial.println("After parse: ");
 	Serial.println(freeRam());
 	DataParser.clearMemory();
 	Serial.println("After clear: ");
 	Serial.println(freeRam());
-	Serial.print(DataReader.getLastHeader());
-	
+	readBuildIdsFromEEPROM();
+}
+
+void updateBuildIdsInEEPROM(String ** ids, byte len) {
+	EEPROM.update(199, len); // read len of  build ids in EEPROM from 200 adress (size = 1024 - 200 = 824) 
+	// delimeter between ids is 0
+	int currentAddress = 200;
+	for (int i = 0; i < len; i++) {
+		for (int j = 0; j < (*ids[i]).length(); j++) {
+			EEPROM.update(currentAddress++, (*ids[i]).charAt(j));
+		}
+		EEPROM.update(currentAddress++, 0); // delimeter
+	}
+	Serial.println(currentAddress);
+}
+
+void readBuildIdsFromEEPROM() {
+	byte len = EEPROM.read(199); // read len of build ids
+	int currentAddr = 200;
+	String temp;
+	for (int i = 0; i < len; i++) {
+		char c = EEPROM.read(currentAddr++);
+		while (c != 0) {
+			temp += c;
+			c = EEPROM.read(currentAddr++);
+		}
+		Serial.println("EEPROM: " + temp);
+		temp.remove(0);
+		Serial.println("curAddr: " + String(currentAddr));
+	}
 }
 
 
@@ -214,7 +244,7 @@ void loop() {
     switch_state(32);
   //esp_reset();
   switch_state(1);
-  String wifi = exec("AT+CWJAP?\r\n");
+  String wifi = exec(F("AT+CWJAP?\r\n"));
   switch_state(4);
   if (wifi.indexOf(WIFI_NAME) == -1) {
     Serial.println(wifi);
