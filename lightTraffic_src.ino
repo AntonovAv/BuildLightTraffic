@@ -1,3 +1,9 @@
+#include "SystemState.h"
+#include "LightTrafficSystem.h"
+
+#include "ResetModuleState.h"
+#include "SetupState.h"
+
 #include "JSONDataParser.h"
 #include "DataReader.h"
 #include <TimerOne.h>
@@ -14,16 +20,19 @@
 #define GREEN_MASK 16
 #define GREEN_BLINK_MASK 32
 #define BLINK_MASK 42
+#define START_ADDRESS_OF_BUILD_IDS 199
 
 #define ESP_RESET 2
 
 const String SERVER_IP = /*"192.168.101.36"*/"192.168.0.101";
-const String PORT = "8088";
+const String PORT = "8080";
 const String WIFI_NAME = "internet";
 const String WIFI_PASS = "654qwerty123";
 
 DataReader_ DataReader; // instanse of data reader
 JSONDataParser_ DataParser;
+
+
 
 void esp_reset() {
   digitalWrite(ESP_RESET, LOW);
@@ -46,10 +55,12 @@ String exec(String command, int pause = 1000, boolean needReturn = true) {
   }
 }
   
-void exec_big_data( String command ) {
+void execGetIdsOfConfigurations( int waitingTime = 5000 ) {
 	// debug output:
-	Serial.println("<send>" + command + "</send>");
+	String command = prepareCommandForExec(F("/builds.jsp"));
+	Serial.print("<send>" + command + "</send>");
 	Serial1.print(command);
+
 	Serial.println("Before init reader: ");
 	Serial.println(freeRam());
 
@@ -58,31 +69,29 @@ void exec_big_data( String command ) {
 	Serial.println("After init reader: ");
 	Serial.println(freeRam());
 	Serial.println("Before init parser: ");
-	String tokens[2] = { "count", "id" };
-	byte length[2] = { 1, 20 };
+	String tokens[2] = { "count" , "id" };
+	byte length[2] = { 1, 20 }; // 1 count data, max 20 ids of configuration
 	Serial.println(freeRam());
 	DataParser.initParser(tokens, 2, length);
 	Serial.println("After init parser: ");
 	Serial.println(freeRam());
-	int time = 5000;
+	int time = waitingTime; // time for wait while data are reading
 	while (time > 0) {
 		while (Serial1.available() > 0) {
 			char c = Serial1.read();
 			c = DataReader.handleNextChar(c);
 			if (-1 != c) {
-				//Serial.write(c);
 				DataParser.parseNextChar(c);
 			}
 		}
 		time -= 1;
 		delay(1);
 	}
-	
-	Serial.println((*DataParser.getResultData()[0][0]));
-	for (int i = 0; i < DataParser.getLengthOfDataResults()[1]; i++) {
-		Serial.println((*DataParser.getResultData()[1][i]));
-	}
-	//updateBuildIdsInEEPROM(DataParser.getResultData()[1], DataParser.getLengthOfDataResults()[1]);
+	closeConnection();
+
+	Serial.println((*DataParser.getResultData()[0][0])); // get len of ids
+
+	//updateBuildIdsInEEPROM(DataParser.getResultData()[1], DataParser.getLengthOfDataResults()[1]); // write ids to eeprom
 	Serial.println("After parse: ");
 	Serial.println(freeRam());
 	DataParser.clearMemory();
@@ -91,10 +100,15 @@ void exec_big_data( String command ) {
 	readBuildIdsFromEEPROM();
 }
 
+/*
+Update in EEPROM IDS of configurations(if data are not changed than write to EEPROM not performed) 
+Start adress contains len of ids
+Ids separated by 0
+*/
 void updateBuildIdsInEEPROM(String ** ids, byte len) {
-	EEPROM.update(199, len); // read len of  build ids in EEPROM from 200 adress (size = 1024 - 200 = 824) 
+	EEPROM.update(START_ADDRESS_OF_BUILD_IDS, len); // read len of  build ids in EEPROM from 200 adress (size = 1024 - 200 = 824) 
 	// delimeter between ids is 0
-	int currentAddress = 200;
+	int currentAddress = START_ADDRESS_OF_BUILD_IDS + 1;
 	for (int i = 0; i < len; i++) {
 		for (int j = 0; j < (*ids[i]).length(); j++) {
 			EEPROM.update(currentAddress++, (*ids[i]).charAt(j));
@@ -104,9 +118,12 @@ void updateBuildIdsInEEPROM(String ** ids, byte len) {
 	Serial.println(currentAddress);
 }
 
+/*
+Read all IDS of configurations from EEPROM
+*/
 void readBuildIdsFromEEPROM() {
-	byte len = EEPROM.read(199); // read len of build ids
-	int currentAddr = 200;
+	byte len = EEPROM.read(START_ADDRESS_OF_BUILD_IDS); // read len of build ids
+	int currentAddr = START_ADDRESS_OF_BUILD_IDS + 1;
 	String temp;
 	for (int i = 0; i < len; i++) {
 		char c = EEPROM.read(currentAddr++);
@@ -120,6 +137,20 @@ void readBuildIdsFromEEPROM() {
 	}
 }
 
+
+String prepareCommandForExec(String url) {
+	String resp = exec("AT+CIPSTART=\"TCP\",\"" + SERVER_IP + "\"," + PORT + "\r\n", 5000);
+	if (resp.indexOf("OK") == -1) return "<error>" + resp + "</error>";
+	/*String header = "GET " + query + " HTTP/1.1\r\nHOST: " + SERVER_IP + "\r\nAccept: application/json\r\n\r\n";*/
+	String header = "GET " + url + " HTTP/1.1\r\n" + "HOST: " + SERVER_IP + "\r\n\r\n";
+	resp = exec("AT+CIPSEND=" + String(header.length()) + "\r\n");
+	if (resp.indexOf(">") == -1) return "<error2>" + resp + "</error2>";
+	return header;
+}
+
+void closeConnection() {
+	Serial.println(exec(F("AT+CIPCLOSE\r\n")));
+}
 
 boolean esp_test() {
   return exec("AT\r\n").indexOf("OK") != -1;
@@ -135,7 +166,7 @@ String esp_get(String query) {
 
   Serial.println("Before execBig: ");
   Serial.println(freeRam());
-  exec_big_data(header);
+  //exec_big_data(header);
   Serial.println(F("After execBig: "));
   Serial.println(freeRam());
   
@@ -237,10 +268,17 @@ void setup() {
   Timer1.attachInterrupt(blink_leds);
   esp_reset();
   wifi_setup();
+  Serial.print("currentFreeMemory(before start): "); Serial.println(freeRam());
 }
 
+
+LightTrafficSystem system = LightTrafficSystem(new SetupState());
+
 void loop() {
-  if (main_state == FIRST_RUN)
+	Serial.print("currentFreeMemory: "); Serial.println(freeRam());
+	system.process();
+	delay(1000);
+ /* if (main_state == FIRST_RUN)
     switch_state(32);
   //esp_reset();
   switch_state(1);
@@ -254,8 +292,10 @@ void loop() {
     return;
   }
   //Serial.print(esp_get("/guestAuth/app/rest/buildTypes/"));
-  esp_get("/builds.jsp");
+  execGetIdsOfConfigurations();
   //esp_get("/");
   switch_state(16);
- // parse_build_types();
+  // parse_build_types();*/
+
+
 }
