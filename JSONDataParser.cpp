@@ -4,6 +4,9 @@
 
 #include "JSONDataParser.h"
 
+JSONDataParser_::~JSONDataParser_() {
+	//clearMemory();
+}
 
 void JSONDataParser_::initParser(String *tokens, int nTokens, byte* maxLengthDataSize){
 

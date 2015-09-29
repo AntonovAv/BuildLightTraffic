@@ -12,6 +12,8 @@
 class JSONDataParser_ {
 public:
 
+	~JSONDataParser_();
+
 	void initParser(String* tokens, int nTokens, byte* maxLengthDataSize);
 
 	void clearMemory();

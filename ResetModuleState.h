@@ -10,6 +10,7 @@
 #endif
 
 #include "SystemState.h"
+#include "BasicLightStrategy.h"
 
 class ResetModuleState : public SystemState {
 
@@ -18,7 +19,7 @@ public:
 	~ResetModuleState();
 
 	void process();
-	SystemState* getNextState();
+	
 };
 
 #endif

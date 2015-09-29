@@ -1,20 +1,24 @@
 // 
 // 
 // 
+#include "ConnectToWiFiState.h"
 #include "ResetModuleState.h"
-#include "SetupState.h"
+
+ResetModuleState::ResetModuleState() {
+	nextState = new ConnectToWiFiState();
+	delayMs = 1000;
+	numberOfMaxRepeat = 0;
+}
+ResetModuleState::~ResetModuleState() {
+	
+}
 
 void ResetModuleState::process() {
 	Serial.println("ResetModuleState");
-}
 
-SystemState* ResetModuleState::getNextState() {
-	return new SetupState();
-}
-
-ResetModuleState::ResetModuleState() {
-	Serial.println("hello");
-}
-ResetModuleState::~ResetModuleState() {
-	Serial.println("hello");
+	digitalWrite(SystemUtils.ESP_RESET_PIN, LOW);
+	delay(100);
+	digitalWrite(SystemUtils.ESP_RESET_PIN, HIGH);
+	delay(2000);
+	Serial.print(Serial1.readString());
 }
