@@ -12,14 +12,16 @@
 class JSONDataParser_ {
 public:
 
+	JSONDataParser_() {};
+	JSONDataParser_(String* tokens, byte nTokens, byte* maxLengthDataSize);
 	~JSONDataParser_();
 
-	void initParser(String* tokens, int nTokens, byte* maxLengthDataSize);
+	void initParser(String* tokens, byte nTokens, byte* maxLengthDataSize);
 
 	void clearMemory();
 
 	void parseNextChar(char &c);
-	int* getLengthOfDataResults();
+	byte* getLengthOfDataResults();
 	String*** getResultData();
 
 private:
@@ -27,7 +29,7 @@ private:
 	void extendResultsArray(int nOfToken, byte n);
 
 	String* tokensForFind;
-	int *resultLengths;
+	byte* resultLengths;
 	byte* maxDataLengths;
 	int* charCounters;
 	String*** results;

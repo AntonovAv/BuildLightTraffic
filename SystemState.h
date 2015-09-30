@@ -21,10 +21,10 @@ public:
 	SystemState* getNextState() { return nextState; }; // next state 
 	BasicLightStrategy* getLightStrategy() { return lightStrategy; }; // strategy for lighting in current state
 	int getNumberOfMaxRepeat() { return numberOfMaxRepeat; }; // max number of need to repeat state 
-	int getDelayAfterProcessState() { return delayMs;  }; // delay want need after process method was performedprotected:
+	unsigned long getDelayAfterProcessState() { return delayMs;  }; // delay want need after process method was performedprotected:
 
 protected:
-	int delayMs = 0;
+	unsigned long delayMs = 0;
 	int numberOfMaxRepeat = 0;
 	BasicLightStrategy* lightStrategy;
 	SystemState* nextState;

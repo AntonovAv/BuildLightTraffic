@@ -9,6 +9,14 @@
 	#include "WProgram.h"
 #endif
 
+#define xstr(s) str(s)
+#define str(s) #s
+
+#define WIFI_NAME internet
+#define WIFI_PASS 654qwerty123
+#define SERVER_IP /*"192.168.101.36"*/192.168.0.101
+#define PORT 8080
+
 class SystemUtils_ {
 
 public:
@@ -16,8 +24,8 @@ public:
 	SystemUtils_(void) {};
 	~SystemUtils_() {};
 
-	String execCommand(String command, int pause = 1000, boolean needReturn = true);
-	String prepareGetRequest(String url);
+	String execCommand(const String& command, int pause = 1000, boolean needReturn = true);
+	String prepareGetRequest(const String& url, boolean needConnect);
 	boolean testModule();
 	void closeConnectionCommand();
 	String connectToWiFi();
@@ -41,13 +49,6 @@ public:
 	*/
 	int readFromEEPROMToString(int startAddress, char stop, String& buffer);
 	
-
-
-	const String SERVER_IP = /*"192.168.101.36"*/"192.168.0.101";
-	const String PORT = "8080";
-	const String WIFI_NAME = "internet";
-	const String WIFI_PASS = "654qwerty123";
-
 	const byte START_EEPROM_ADDRESS_BUILD_IDS = 199;
 	const byte START_EEPROM_ADDRESS_ERRORS = 0;
 

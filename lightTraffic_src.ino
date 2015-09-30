@@ -97,18 +97,19 @@ void setup() {
   while (!Serial) {}
   Serial.println("Hello");
   Serial1.begin(115200);
-  Timer1.initialize(1000); // 1 sec
-  Timer1.stop();
-  Timer1.attachInterrupt(blink_leds);
+ // Timer1.initialize(1000); // 1 sec
+  //Timer1.stop();
+  //Timer1.attachInterrupt(blink_leds);
 
-  Serial.print("currentFreeMemory(before start): "); Serial.println(freeRam());
+  Serial.print(F("currentFreeMemory(before start): ")); Serial.println(freeRam());
 }
 
 
 LightTrafficSystem system = LightTrafficSystem(new ResetModuleState());
 
 void loop() {
-	Serial.print("currentFreeMemory: "); Serial.println(freeRam());
+	//SystemUtils.readBuildIdsFromEEPROM();
+	Serial.print(F("currentFreeMemory: ")); Serial.println(freeRam());
 	//ResetModuleState rm;
 	//rm.process();
 	//rm.getNextState()->process();

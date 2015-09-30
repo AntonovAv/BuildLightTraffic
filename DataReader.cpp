@@ -152,7 +152,15 @@ void DataReader_::initRead(boolean isNeedHeader) {
 	tempHeader = new String;
 }
 
+DataReader_::DataReader_(boolean saveHeader) {
+	initRead(saveHeader);
+}
 
+DataReader_::~DataReader_() {
+	if (saveHeader) {
+		delete tempHeader;
+	}
+}
 
 String & DataReader_::getLastHeader() {
 	return lastResponseHeader;

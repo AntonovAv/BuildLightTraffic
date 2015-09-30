@@ -5,16 +5,45 @@
 #include "JSONDataParser.h"
 
 JSONDataParser_::~JSONDataParser_() {
-	//clearMemory();
+	
+	for (int i = 0; i < numberOfTokens; i++) {
+		for (int j = 0; j < resultLengths[i]; j++) {
+			delete results[i][j];
+		}
+		delete[] results[i];
+	}
+	delete results;
+
+	delete[] tokensForFind;
+	delete[] resultLengths;
+	delete[] charCounters;
 }
 
-void JSONDataParser_::initParser(String *tokens, int nTokens, byte* maxLengthDataSize){
+JSONDataParser_::JSONDataParser_(String* tokens, byte nTokens, byte* maxLengthDataSize) {
+	numberOfTokens = nTokens;
+	tokensForFind = new String[nTokens];
+
+	maxDataLengths = maxLengthDataSize;
+	resultLengths = new byte[nTokens];
+	charCounters = new int[nTokens];
+
+	results = new String**[nTokens];
+	// init values
+	for (int i = 0; i < nTokens; i++) {
+		resultLengths[i] = 0;
+		charCounters[i] = 0;
+		tokensForFind[i] = tokens[i] + tokenEnd;
+		results[i] = new String*[maxLengthDataSize[i]];
+	}
+}
+
+void JSONDataParser_::initParser(String *tokens, byte nTokens, byte* maxLengthDataSize){
 
 	numberOfTokens = nTokens;
 	tokensForFind = new String[nTokens];
 
 	maxDataLengths = maxLengthDataSize;
-	resultLengths = new int[nTokens];
+	resultLengths = new byte[nTokens];
 	charCounters = new int[nTokens];
 
 	results = new String** [nTokens];
@@ -93,7 +122,7 @@ void JSONDataParser_::parseNextChar(char &c) {
 	}
 }
 
-int* JSONDataParser_::getLengthOfDataResults() {
+byte* JSONDataParser_::getLengthOfDataResults() {
 	return resultLengths;
 }
 

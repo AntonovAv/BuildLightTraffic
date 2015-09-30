@@ -11,6 +11,11 @@
 
 class DataReader_ {
 public:
+
+	DataReader_() {};
+	DataReader_(boolean saveHeader);
+	~DataReader_();
+
 	void initRead(boolean isNeedHeader);
 	// handle next char (return -1 if char is not data or char if it is data)
 	char handleNextChar(char &c);
@@ -40,11 +45,11 @@ private:
 
 	boolean isReadHeader = false; // if header already read
 	boolean isChunked = false;  // if data encoding is chuncked
-
+	
 	String CHUNKED_TEMPLATE = "chunked";
 	String IPD_COM_TEMPLATE = "+IPD,";
 	String END_OF_HEADER_TEMPLATE = "\r\n\r\n";
-
+	
 	int char_count; // temp counter when need to find string
 
 	String data_len_not_parse; // len of data after IPD

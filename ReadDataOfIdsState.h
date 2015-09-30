@@ -18,7 +18,8 @@ public:
 
 	void process();
 private:
-	void handleID(String& id);
+	// return true if read is success
+	boolean handleID(String id, boolean isFirst);
 };
 
 #endif
