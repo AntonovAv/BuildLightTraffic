@@ -51,7 +51,7 @@ void ReadIdsState::process() {
 
 	// read "count"
 	byte idsInResponce;
-	boolean success;
+	boolean success = false;
 
 	if (dataParser->getLengthOfDataResults()[0] != 0) {
 		idsInResponce = dataParser->getResultData()[0][0]->toInt();
@@ -64,7 +64,7 @@ void ReadIdsState::process() {
 		success = false;
 	}
 	else {
-		//SystemUtils.updateBuildsIdsInEEPROM(dataParser->getResultData()[1], dataParser->getLengthOfDataResults()[1]); // write ids to eeprom
+		SystemUtils.updateBuildsIdsInEEPROM(dataParser->getResultData()[1], dataParser->getLengthOfDataResults()[1]); // write ids to eeprom
 		success = true; 
 	}
 	SystemUtils.closeConnectionCommand();
@@ -77,7 +77,7 @@ void ReadIdsState::process() {
 		nextState = new ReadDataOfIdsState();
 	}
 	else {
-		nextState = this;
+		nextState = 0;
 	}
 }
 

@@ -10,11 +10,14 @@ LightTrafficSystem::LightTrafficSystem(SystemState* st) {
 
 void LightTrafficSystem::setCurrentState() {
 	Serial.print(F("before Delete: ")); Serial.println(SystemUtils.freeRam());
-	SystemState* newState = currentState->getNextState();
-	Serial.print(F("copy: ")); Serial.println(SystemUtils.freeRam());
-	delete currentState;
-	Serial.print(F("delete: ")); Serial.println(SystemUtils.freeRam());
-	currentState = newState;
+	if (currentState->getNextState() != 0) {
+		SystemState* newState = currentState->getNextState();
+		Serial.print(F("copy: ")); Serial.println(SystemUtils.freeRam());
+		delete currentState;
+		Serial.print(F("delete: ")); Serial.println(SystemUtils.freeRam());
+		currentState = newState;
+	}
+	
 }
 
 void LightTrafficSystem::process() {
