@@ -29,8 +29,8 @@ byte SystemUtils_::prepareGetRequest(String& request, boolean needConnect) {
 		}
 	}
 	
-	/*String header = "GET " + query + " HTTP/1.1\r\nHOST: " + SERVER_IP + "\r\nAccept: application/json\r\n\r\n";*/
-	request = ("GET " + request + " HTTP/1.1\r\nHOST: " xstr(SERVER_IP) "\r\n\r\n");
+	request = "GET " + request + " HTTP/1.1\r\nHOST: " xstr(SERVER_IP) "\r\nAccept: application/json\r\n\r\n";
+	//request = ("GET " + request + " HTTP/1.1\r\nHOST: " xstr(SERVER_IP) "\r\n\r\n");
 	resp = execCommand("AT+CIPSEND=" + String(request.length()) + "\r\n");
 
 	if (resp.indexOf(">") == -1) {
