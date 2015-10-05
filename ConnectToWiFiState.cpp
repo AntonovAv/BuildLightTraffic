@@ -9,7 +9,8 @@
 
 ConnectToWiFiState::ConnectToWiFiState() {
 	nextState = 0;
-	delayMs = 1000;
+
+	delayMs = 1000; // 1 sec
 
 	MAX_REPEATS = 10;// try to connect if not success -> reset module
 	countOfRepeats = 0;

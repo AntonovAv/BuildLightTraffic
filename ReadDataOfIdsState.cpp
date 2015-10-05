@@ -15,8 +15,8 @@
 
 
 ReadDataOfIdsState::ReadDataOfIdsState() {
-	//delayMs = 1 * 60 * 1000; // 1 minute if all good
-	delayMs = 0;
+	delayMs = 1 * 60 * 1000; // 1 minute if all good
+	//delayMs = 0;
 	MAX_REPEATS = 3; 
 	countOfRepeats = 0;
 
@@ -79,10 +79,14 @@ void ReadDataOfIdsState::process() {
 	}
 	else {
 		if (countOfRepeats < MAX_REPEATS) {
+			delayMs = 5000; //5sec
+
 			countOfRepeats++;
 			nextState = 0;
 		}
 		else {
+			delayMs = 5000;
+
 			lightStrategy = new BuildServerRequestErrorLightStrategy();
 			nextState = new BuildServerErrorState(); // bs error state
 		}
@@ -91,9 +95,9 @@ void ReadDataOfIdsState::process() {
 
 byte ReadDataOfIdsState::handleID(String id, boolean needConnect) {
 	//String request = "/buildinfo.jsp?id=" + id; // need to change
-	String request = String(F( xstr(BUILD_TYPES_URL) ));
-	request += String(F( xstr(BUILD_TYPES_URL) ));
-	request.replace(F( str(ID_PLACEHOLDER ) ), id);
+	String request = String(F( BUILD_TYPES_URL ));
+	request += String(F( BUILD_STATE_URL ));
+	request.replace(F( ID_PLACEHOLDER ), id);
 
 	byte responce = SystemUtils.prepareGetRequest(request, needConnect);
 	if (responce != NO_ERRORS) {

@@ -9,7 +9,7 @@
 
 BuildServerErrorState::BuildServerErrorState() {
 	MAX_REPEATS = 10;
-	delayMs = 2000; //1min? 10 sec ok
+	delayMs = 2000; //2 sec if all good
 	countOfRepeats = 0;
 	nextState = 0;
 
@@ -36,11 +36,15 @@ void BuildServerErrorState::process() {
 	}
 	else {
 		if (countOfRepeats < MAX_REPEATS) {
+			delayMs = 5000; // 5 sec
+
 			countOfRepeats++;
 			nextState = 0;
 			lightStrategy = new BuildServerErrorLightStrategy();
 		}
 		else {
+			delayMs = 2000; // 2 sec
+
 			nextState = new ResetModuleState();
 		}
 	}

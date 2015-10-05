@@ -10,7 +10,7 @@
 #include "JSONDataParser.h"
 
 ReadIdsState::ReadIdsState() {
-	delayMs = 0;//1000
+	delayMs = 1000;//1000
 	MAX_REPEATS = 3;
 	nextState = 0;
 	countOfRepeats = 0;
@@ -30,6 +30,7 @@ void ReadIdsState::process() {
 	byte resp = readIds();
 
 	if (resp == NO_ERRORS ) {
+		delayMs = 5000;
 		nextState = new ReadDataOfIdsState();
 	}
 	else {
@@ -48,7 +49,7 @@ void ReadIdsState::process() {
 byte ReadIdsState::readIds() {
 	
 	//String request = "/builds.jsp";
-	String request = String(F( xstr(BUILD_TYPES_URL ) ) );
+	String request = String(F( BUILD_TYPES_URL ) );
 
 	byte responce = SystemUtils.prepareGetRequest(request, true); // need to change
 

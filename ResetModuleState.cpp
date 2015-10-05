@@ -6,6 +6,7 @@
 
 ResetModuleState::ResetModuleState() {
 	nextState = new ConnectToWiFiState();
+
 	delayMs = 1000;
 
 	MAX_REPEATS = 0;
