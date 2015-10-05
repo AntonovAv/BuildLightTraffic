@@ -9,7 +9,9 @@
 
 BuildServerErrorState::BuildServerErrorState() {
 	MAX_REPEATS = 10;
-	delayMs = 2000; //2 sec if all good
+
+	delayMs = 5000; //5 sec default
+	
 	countOfRepeats = 0;
 	nextState = 0;
 
@@ -32,17 +34,16 @@ void BuildServerErrorState::process() {
 	SystemUtils.closeConnectionCommand();
 
 	if (resp == NO_ERRORS) {
+		delayMs = 2000; // if all good
 		nextState = new ReadIdsState();
 	}
 	else {
 		if (countOfRepeats < MAX_REPEATS) {
-			delayMs = 5000; // 5 sec
 
 			countOfRepeats++;
 			nextState = 0;
 		}
 		else {
-			delayMs = 2000; // 2 sec
 
 			lightStrategy = new BuildServerErrorLightStrategy();
 

@@ -15,7 +15,7 @@
 
 
 ReadDataOfIdsState::ReadDataOfIdsState() {
-	delayMs = 1 * 60 * 1000; // 1 minute if all good
+	delayMs = 5000; // 5 sec default
 	//delayMs = 0;
 	MAX_REPEATS = 6;
 
@@ -64,7 +64,11 @@ void ReadDataOfIdsState::process() {
 	
 	// choose next state
 	if (resp == NO_ERRORS) {
+
+		delayMs = 60000; // 1 minute if all good
+
 		nextState = new ReadIdsState();
+
 		Serial.println(STATE_OF_BUILDS);
 		// change light strategy
 		switch (STATE_OF_BUILDS) {
@@ -80,13 +84,11 @@ void ReadDataOfIdsState::process() {
 	}
 	else {
 		if (countOfRepeats < MAX_REPEATS) {
-			delayMs = 5000; //5sec
 
 			countOfRepeats++;
 			nextState = 0;
 		}
 		else {
-			delayMs = 5000;
 
 			lightStrategy = new BuildServerRequestErrorLightStrategy();
 			nextState = new BuildServerErrorState(); // bs error state

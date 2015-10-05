@@ -32,7 +32,9 @@ void ReadIdsState::process() {
 	SystemUtils.closeConnectionCommand();
 
 	if (resp == NO_ERRORS ) {
-		delayMs = 5000;
+
+		delayMs = 5000; // if all good 
+
 		nextState = new ReadDataOfIdsState();
 	}
 	else {
