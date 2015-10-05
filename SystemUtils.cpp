@@ -13,31 +13,39 @@ String SystemUtils_::execCommand(const String& command, int pause, boolean needR
 		Serial1.setTimeout(pause);
 		String response = Serial1.readString();
 		// debug output:
-		//Serial.println("<r>" + response + "</r");
+		Serial.println("<r>" + response + "</r");
 		return response;
 	}
 }
 
-String SystemUtils_::prepareGetRequest(const String& url, boolean needConnect) {
+byte SystemUtils_::prepareGetRequest(String& request, boolean needConnect) {
 	String resp;
 	if (needConnect) {
 
 		resp = execCommand(F("AT+CIPSTART=\"TCP\",\""  xstr(SERVER_IP)  "\"," xstr(PORT) "\r\n"), 5000);
 
-		if (resp.indexOf(F("OK")) == -1) return "<e1>" + resp + "</e1>";
+		if (resp.indexOf(F("OK")) == -1) {
+			return NOT_CONNECTED_ERROR;
+		}
 	}
 	
 	/*String header = "GET " + query + " HTTP/1.1\r\nHOST: " + SERVER_IP + "\r\nAccept: application/json\r\n\r\n";*/
-	String header = "GET " + url + " HTTP/1.1\r\nHOST: " xstr(SERVER_IP) "\r\n\r\n";
-	resp = execCommand("AT+CIPSEND=" + String(header.length()) + "\r\n");
+	request = ("GET " + request + " HTTP/1.1\r\nHOST: " xstr(SERVER_IP) "\r\n\r\n");
+	resp = execCommand("AT+CIPSEND=" + String(request.length()) + "\r\n");
 
-	if (resp.indexOf(">") == -1) return "<e2>" + resp + "</e2>";
+	if (resp.indexOf(">") == -1) {
+		return GET_REQUEST_NOT_PREPARED_ERROR;
+	}
 
-	return header;
+	return NO_ERRORS;
 }
 
-String SystemUtils_::connectToWiFi() {
-	return execCommand(F("AT+CWJAP=\"" xstr(WIFI_NAME) "\",\""  xstr(WIFI_PASS) "\"\r\n"), 5000 );
+byte SystemUtils_::connectToWiFi() {
+	if (execCommand(F("AT+CWJAP=\"" xstr(WIFI_NAME) "\",\""  xstr(WIFI_PASS) "\"\r\n"), 10000).indexOf(F("OK")) == -1) {
+		//Serial.println(Serial1.readString());
+		return WIFI_CONNECTION_ERROR;
+	}
+	return NO_ERRORS;
 }
 
 int SystemUtils_::freeRam() {
@@ -46,12 +54,18 @@ int SystemUtils_::freeRam() {
 	return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
 }
 
-boolean SystemUtils_::testModule() {
-	return execCommand(F("AT\r\n")).indexOf(F("OK")) != -1;
+byte SystemUtils_::testModule() {
+	if (execCommand(F("AT\r\n")).indexOf(F("OK")) == -1) {
+		return WIFI_MODULE_NOT_WORK_ERROR;
+	}
+	return NO_ERRORS;
 }
 
-void SystemUtils_::closeConnectionCommand() {
-	Serial.println(execCommand(F("AT+CIPCLOSE\r\n"), 2000));
+byte SystemUtils_::closeConnectionCommand() {
+	if (execCommand(F("AT+CIPCLOSE\r\n")).indexOf(F("OK")) ==  -1) {
+		return CONN_NOT_CLOSED_ERROR;
+	}
+	return NO_ERRORS;
 }
 
 int SystemUtils_::updateBuildsIdsInEEPROM(String** ids, byte len) {

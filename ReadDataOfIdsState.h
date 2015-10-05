@@ -11,6 +11,10 @@
 
 #include "SystemState.h"
 
+#define SUCCESS 1
+#define FAILED 2
+#define FAILED_AND_RUNNING 3
+
 class ReadDataOfIdsState : public SystemState {
 public:
 	ReadDataOfIdsState();
@@ -18,8 +22,10 @@ public:
 
 	void process();
 private:
-	// return true if read is success
-	boolean handleID(String id, boolean isFirst);
+	// return error code
+	byte handleID(String id, boolean needConnect);
+
+	byte STATE_OF_BUILDS;
 };
 
 #endif

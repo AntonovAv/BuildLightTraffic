@@ -9,11 +9,16 @@
 	#include "WProgram.h"
 #endif
 
+#include "SystemUtils.h"
+
 class BasicLightStrategy {
 public:
 	virtual ~BasicLightStrategy() {};
-	virtual void lighting() = 0;
-	virtual void updateCounterIfNeed();
+	virtual void lighting() = 0; // one in 1/1000 sec
+	void leds(boolean red, boolean yellow, boolean green);
+protected:
+	int innerCounter;
+	int countsFor1Sec = 1 * COEFF_FOR_1SEC; // 1 sec
 };
 
 #endif

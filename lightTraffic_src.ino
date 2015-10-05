@@ -1,3 +1,11 @@
+#include "WiFiConnectionErrorLightStrategy.h"
+#include "BuildServerRequestErrorLightStrategy.h"
+#include "BuildsFailedAndRunningLightStrategy.h"
+#include "BuildsFailedLightStrategy.h"
+#include "BuildServerErrorLightStrategy.h"
+#include "InitSystemLightStrategy.h"
+#include "BuildsSuccessLightStrategy.h"
+#include "BuildServerErrorState.h"
 #include "ReadDataOfIdsState.h"
 #include "ReadIdsState.h"
 #include "ConnectToWiFiState.h"
@@ -29,27 +37,6 @@
 #define ESP_RESET 2
 
 
-/*
-String esp_get(String query) {
-  String resp = exec("AT+CIPSTART=\"TCP\",\"" + SERVER_IP + "\"," +PORT+ "\r\n", 5000);
-  if (resp.indexOf("OK") == -1) return "<error>" + resp + "</error>";
-  /*String header = "GET " + query + " HTTP/1.1\r\nHOST: " + SERVER_IP + "\r\nAccept: application/json\r\n\r\n";*/
-  /*String header = "GET " + query + " HTTP/1.1\r\n" + "HOST: " + SERVER_IP + "\r\n\r\n";
-  resp = exec("AT+CIPSEND=" + String(header.length()) + "\r\n");
-  if (resp.indexOf(">") == -1) return "<error2>" + resp + "</error2>";
-
-  Serial.println("Before execBig: ");
-  Serial.println(freeRam());
-  //exec_big_data(header);
-  Serial.println(F("After execBig: "));
-  Serial.println(freeRam());
-  
-}*/
-
-enum main_states { FIRST_RUN, WAIT_A_MINUTE, WAIT_ESP_ANSWER, TEST_ESP_OK };
-
-main_states main_state = FIRST_RUN;
-
 byte light_state_cur = 0;
 
 void blink_leds() {
@@ -79,12 +66,10 @@ void pinWrite(byte pin, boolean high) {
     digitalWrite(pin, LOW);
 }
 
+LightTrafficSystem system = LightTrafficSystem(new ResetModuleState(), new InitSystemLightStrategy());
 
-int freeRam()
-{
-	extern int __heap_start, *__brkval;
-	int v;
-	return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
+void light() {
+	system.lighting();
 }
 
 void setup() {
@@ -94,46 +79,18 @@ void setup() {
   pinMode(GREEN, OUTPUT);
   pinMode(ESP_RESET, OUTPUT);
   Serial.begin(115200);
-  while (!Serial) {}
+  //while (!Serial) {}
   Serial.println("Hello");
   Serial1.begin(115200);
- // Timer1.initialize(1000); // 1 sec
+  Timer1.initialize(1000000/COEFF_FOR_1SEC); // 1 sec/COEFF sec
   //Timer1.stop();
-  //Timer1.attachInterrupt(blink_leds);
+  Timer1.attachInterrupt(light);
 
-  Serial.print(F("currentFreeMemory(before start): ")); Serial.println(freeRam());
+  Serial.print(F("currentFreeMemory(before start): ")); Serial.println(SystemUtils.freeRam());
 }
 
-
-LightTrafficSystem system = LightTrafficSystem(new ResetModuleState());
-
 void loop() {
-	//SystemUtils.readBuildIdsFromEEPROM();
-	Serial.print(F("currentFreeMemory: ")); Serial.println(freeRam());
-	//ResetModuleState rm;
-	//rm.process();
-	//rm.getNextState()->process();
+
+	Serial.print(F("currentFreeMemory: ")); Serial.println(SystemUtils.freeRam());
 	system.process();
-	delay(5000);
-
- /* if (main_state == FIRST_RUN)
-    switch_state(32);
-  //esp_reset();
-  switch_state(1);
-  String wifi = exec(F("AT+CWJAP?\r\n"));
-  switch_state(4);
-  if (wifi.indexOf(WIFI_NAME) == -1) {
-    Serial.println(wifi);
-    digitalWrite(YELLOW, HIGH);
-    delay(1000);
-    digitalWrite(YELLOW, LOW);
-    return;
-  }
-  //Serial.print(esp_get("/guestAuth/app/rest/buildTypes/"));
-  execGetIdsOfConfigurations();
-  //esp_get("/");
-  switch_state(16);
-  // parse_build_types();*/
-
-
 }

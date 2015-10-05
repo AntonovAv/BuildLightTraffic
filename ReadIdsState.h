@@ -20,6 +20,8 @@ public:
 
 	void process();
 
+private:
+	byte readIds();
 };
 #endif
 

@@ -99,6 +99,7 @@ char DataReader_::handleNextChar(char &c) {
 
 				if (!saveHeader) {
 					delete tempHeader; // release memory
+					tempHeader = 0;
 				}
 				isReadHeader = true;
 				// need to implement return header
@@ -157,7 +158,7 @@ DataReader_::DataReader_(boolean saveHeader) {
 }
 
 DataReader_::~DataReader_() {
-	if (saveHeader) {
+	if (tempHeader != 0) {
 		delete tempHeader;
 	}
 }

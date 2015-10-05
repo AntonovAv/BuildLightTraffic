@@ -12,10 +12,39 @@
 #define xstr(s) str(s)
 #define str(s) #s
 
-#define WIFI_NAME internet
-#define WIFI_PASS 654qwerty123
+//define error codes
+#define NO_ERRORS 1
+
+#define CONN_NOT_CLOSED_ERROR 11
+#define NOT_CONNECTED_ERROR 13
+#define ALREADY_CONNECTED_ERROR 14
+#define GET_REQUEST_NOT_PREPARED_ERROR 15
+#define GET_NOT_PERFORMED_ERROR 16
+
+#define WIFI_MODULE_NOT_WORK_ERROR 21
+#define WIFI_CONNECTION_ERROR 22
+#define WIFI_AP_NOT_AVAILABLE 23
+
+#define READ_CONFIG_IDS_ERROR 31
+
+#define READ_STATE_OF_ID_ERROR 41
+
+#define WIFI_NAME internet/*Acti311*/
+#define WIFI_PASS 654qwerty123/*Actimind79Password*/
 #define SERVER_IP /*"192.168.101.36"*/192.168.0.101
-#define PORT 8080
+#define PORT 8080/*80*/
+
+#define BUILD_TYPES_URL /guestAuth/app/rest/buildTypes/
+#define BUILD_STATE_URL id:@/builds/?locator=count:2,running:any
+#define ID_PLACEHOLDER #
+
+#define RED_PIN 6
+#define YELLOW_PIN 5
+#define GREEN_PIN 3
+#define DUTY 50 // 0 to 255
+#define COEFF_FOR_1SEC 10 // 10 times is 1 sec
+
+#define MODULE_RESET_PIN 2
 
 class SystemUtils_ {
 
@@ -25,10 +54,10 @@ public:
 	~SystemUtils_() {};
 
 	String execCommand(const String& command, int pause = 1000, boolean needReturn = true);
-	String prepareGetRequest(const String& url, boolean needConnect);
-	boolean testModule();
-	void closeConnectionCommand();
-	String connectToWiFi();
+	byte prepareGetRequest(String& request, boolean needConnect);
+	byte testModule();
+	byte closeConnectionCommand();
+	byte connectToWiFi();
 
 	int freeRam();
 
@@ -52,10 +81,6 @@ public:
 	const byte START_EEPROM_ADDRESS_BUILD_IDS = 199;
 	const byte START_EEPROM_ADDRESS_ERRORS = 0;
 
-	const byte RED_PIN = 6;
-	const byte YELLOW_PIN = 5;
-	const byte GREEN_PIN = 3;
-	const byte ESP_RESET_PIN = 2;
 };
 
 static SystemUtils_ SystemUtils;

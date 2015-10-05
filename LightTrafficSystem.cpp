@@ -4,8 +4,10 @@
 
 #include "LightTrafficSystem.h"
 
-LightTrafficSystem::LightTrafficSystem(SystemState* st) {
+
+LightTrafficSystem::LightTrafficSystem(SystemState* st, BasicLightStrategy* lstr) {
 	currentState = st;
+	currentLightStrategy = lstr;
 };
 
 void LightTrafficSystem::setCurrentState() {
@@ -17,11 +19,33 @@ void LightTrafficSystem::setCurrentState() {
 		Serial.print(F("delete: ")); Serial.println(SystemUtils.freeRam());
 		currentState = newState;
 	}
-	
+}
+
+void LightTrafficSystem::updateLightStrategy() {
+	// update light strategy
+	Serial.print(F("before upd lstr: ")); Serial.println(SystemUtils.freeRam());
+	if (currentState->getLightStrategy() != 0) {
+		delete currentLightStrategy;
+		currentLightStrategy = 0;
+
+		currentLightStrategy = currentState->getLightStrategy();
+	}
+	Serial.print(F("after upd lstr: ")); Serial.println(SystemUtils.freeRam());
 }
 
 void LightTrafficSystem::process() {
 	currentState->process();
-	setCurrentState();
+
+	updateLightStrategy();
+
 	delay(currentState->getDelayAfterProcessState());
+
+	setCurrentState();
+
+}
+
+void LightTrafficSystem::lighting() {
+	if (currentLightStrategy != 0) {
+		currentLightStrategy->lighting(); // perform one in 1/10sec
+	}
 }
