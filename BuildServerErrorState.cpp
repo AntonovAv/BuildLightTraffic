@@ -40,10 +40,11 @@ void BuildServerErrorState::process() {
 
 			countOfRepeats++;
 			nextState = 0;
-			lightStrategy = new BuildServerErrorLightStrategy();
 		}
 		else {
 			delayMs = 2000; // 2 sec
+
+			lightStrategy = new BuildServerErrorLightStrategy();
 
 			nextState = new ResetModuleState();
 		}
