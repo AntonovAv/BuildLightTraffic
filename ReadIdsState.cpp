@@ -29,6 +29,8 @@ void ReadIdsState::process() {
 
 	byte resp = readIds();
 
+	SystemUtils.closeConnectionCommand();
+
 	if (resp == NO_ERRORS ) {
 		delayMs = 5000;
 		nextState = new ReadDataOfIdsState();
@@ -54,6 +56,7 @@ byte ReadIdsState::readIds() {
 	byte responce = SystemUtils.prepareGetRequest(request, true); // need to change
 
 	if (responce != NO_ERRORS) {
+
 		return responce;
 	}
 	// debug

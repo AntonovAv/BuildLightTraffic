@@ -17,7 +17,8 @@
 ReadDataOfIdsState::ReadDataOfIdsState() {
 	delayMs = 1 * 60 * 1000; // 1 minute if all good
 	//delayMs = 0;
-	MAX_REPEATS = 3; 
+	MAX_REPEATS = 6;
+
 	countOfRepeats = 0;
 
 	nextState = 0;
