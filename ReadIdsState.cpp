@@ -106,8 +106,6 @@ byte ReadIdsState::readIds() {
 		success = true;
 	}
 
-	SystemUtils.closeConnectionCommand();
-
 	// !important
 	delete dataParser;
 	delete dataReader;

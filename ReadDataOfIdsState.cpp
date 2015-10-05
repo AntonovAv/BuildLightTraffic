@@ -117,7 +117,7 @@ byte ReadDataOfIdsState::handleID(String id, boolean needConnect) {
 	DataReader_* dataReader = new DataReader_(false);
 	JSONDataParser_* dataParser = new JSONDataParser_(tokens, 2, lengths);
 
-	int time = 1500; // time for wait while data are reading
+	int time = 2000; // time for wait while data are reading
 	while (time > 0) {
 		while (Serial1.available() > 0) {
 			char c = Serial1.read();
