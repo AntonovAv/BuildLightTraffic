@@ -29,10 +29,10 @@
 
 #define READ_STATE_OF_ID_ERROR 41
 
-#define WIFI_NAME internet/*Acti311*/
-#define WIFI_PASS 654qwerty123/*Actimind79Password*/
-#define SERVER_IP /*"192.168.101.36"*/192.168.0.101
-#define PORT 8080/*80*/
+#define WIFI_NAME /*internet*/Acti311
+#define WIFI_PASS /*654qwerty123*/Actimind79Password
+#define SERVER_IP 192.168.101.36/*192.168.0.101*/
+#define PORT /*8080*/80
 
 #define BUILD_TYPES_URL /guestAuth/app/rest/buildTypes/
 #define BUILD_STATE_URL id:@/builds/?locator=count:2,running:any
