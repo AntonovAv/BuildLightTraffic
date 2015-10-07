@@ -36,40 +36,11 @@
 
 #define ESP_RESET 2
 
-
-byte light_state_cur = 0;
-
-void blink_leds() {
-	Serial.println("kuku");
-  if (light_state_cur & RED_BLINK_MASK)
-    digitalWrite(RED, !digitalRead(RED));
-  if (light_state_cur & YELLOW_BLINK_MASK)
-    digitalWrite(YELLOW, !digitalRead(YELLOW));
-  if (light_state_cur & GREEN_BLINK_MASK)
-    digitalWrite(GREEN, !digitalRead(GREEN));
-}
-
-void switch_state(byte state) {
-  Timer1.stop();
-  light_state_cur = state;
-  pinWrite(RED, light_state_cur & RED_MASK);
-  pinWrite(YELLOW, light_state_cur & YELLOW_MASK);
-  pinWrite(GREEN, light_state_cur & GREEN_MASK);
-  if (light_state_cur & BLINK_MASK)
-    Timer1.restart();
-}
-
-void pinWrite(byte pin, boolean high) {
-  if (high)
-    digitalWrite(pin, HIGH);
-  else
-    digitalWrite(pin, LOW);
-}
-
 LightTrafficSystem system = LightTrafficSystem(new ResetModuleState(), new InitSystemLightStrategy());
 
 void light() {
 	system.lighting();
+	system.checkAliveOfSystem();
 }
 
 void setup() {

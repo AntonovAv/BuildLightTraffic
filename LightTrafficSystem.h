@@ -20,9 +20,13 @@ public:
 	void setCurrentState();
 	void lighting(); // shoud perform one in 1/1000 second
 	void updateLightStrategy();
+	void checkAliveOfSystem(); // check time between state changes and if it is too big - set init states ( method is performed in timer interrupt)
 private:
 	SystemState* currentState;
 	BasicLightStrategy* currentLightStrategy;
+
+	int MAX_BUSY_TIME = 120 * COEFF_FOR_1SEC; //2 minute max time between state switch
+	int counterForBusyTime = 0; // resets in process method
 };
 
 #endif
