@@ -97,7 +97,7 @@ char DataReader_::handleNextChar(char &c) {
 					chunkedState = READ_CHUNKED_LEN;
 				}
 
-				if (!saveHeader) {
+				if (!saveHeader && tempHeader != 0) { // fix?!
 					delete tempHeader; // release memory
 					tempHeader = 0;
 				}

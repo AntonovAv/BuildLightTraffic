@@ -102,6 +102,9 @@ byte ReadDataOfIdsState::handleID(String id, boolean needConnect) {
 	request += String(F( BUILD_STATE_URL ));
 	request.replace(F( ID_PLACEHOLDER ), id);
 
+	byte lenNoPreparedRequest = request.length();
+
+
 	byte responce = SystemUtils.prepareGetRequest(request, needConnect);
 	if (responce != NO_ERRORS) {
 		return responce;
@@ -110,6 +113,12 @@ byte ReadDataOfIdsState::handleID(String id, boolean needConnect) {
 	Serial.print("<s>" + request + "</s>");
 	
 	Serial1.print(request);
+	//Serial1.setTimeout(1000);
+	//String buffer = Serial1.readStringUntil('\r');
+	/*Serial.println(F("Sended get: "));
+	Serial.println(buffer);
+	Serial.println(F("Sended get end "));*/
+	
 
 	String tokens[2] = { F("status") , F("state") };
 	byte lengths[2] = { 2, 2 };  
@@ -118,17 +127,23 @@ byte ReadDataOfIdsState::handleID(String id, boolean needConnect) {
 	JSONDataParser_* dataParser = new JSONDataParser_(tokens, 2, lengths);
 
 	int time = 2000; // time for wait while data are reading
+	int counter = 0;
+	
 	while (time > 0) {
 		while (Serial1.available() > 0) {
+			
 			char c = Serial1.read();
+			Serial.print(c);
 			c = dataReader->handleNextChar(c);
 			if (-1 != c) {
+				
 				dataParser->parseNextChar(c);
 			}
 		}
 		time -= 1;
 		delay(1);
 	}
+	Serial.println();
 	
 	boolean success;
 	Serial.println("id: " + id);
