@@ -12,26 +12,22 @@ LightTrafficSystem::LightTrafficSystem(SystemState* st, BasicLightStrategy* lstr
 };
 
 void LightTrafficSystem::setCurrentState() {
-	Serial.print(F("before Delete: ")); Serial.println(SystemUtils.freeRam());
 	if (currentState->getNextState() != 0) {
 		SystemState* newState = currentState->getNextState();
-		Serial.print(F("copy: ")); Serial.println(SystemUtils.freeRam());
 		delete currentState;
-		Serial.print(F("delete: ")); Serial.println(SystemUtils.freeRam());
 		currentState = newState;
 	}
+	//Serial.print(F("Memory aafter change state: ")); Serial.println(SystemUtils.freeRam());
 }
 
 void LightTrafficSystem::updateLightStrategy() {
 	// update light strategy
-	Serial.print(F("before upd lstr: ")); Serial.println(SystemUtils.freeRam());
 	if (currentState->getLightStrategy() != 0) {
 		delete currentLightStrategy;
 		currentLightStrategy = 0;
 
 		currentLightStrategy = currentState->getLightStrategy();
 	}
-	Serial.print(F("after upd lstr: ")); Serial.println(SystemUtils.freeRam());
 }
 
 void LightTrafficSystem::process() {
@@ -58,12 +54,11 @@ void LightTrafficSystem::checkAliveOfSystem() {
 	}
 	else { 
 		// system is stoped
-		Serial.print(F("System is stoped")); Serial.println(SystemUtils.freeRam());
+		Serial.print(F("System is stoped: ")); Serial.println(SystemUtils.freeRam());
 		if (currentState != 0) {
 			delete currentState;
 		}
 		currentState = new ReadIdsState(); // go read ids
 		counterForBusyTime = 0;
-		//setCurrentState();
 	}
 }

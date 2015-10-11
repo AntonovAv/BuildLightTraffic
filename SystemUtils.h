@@ -31,7 +31,7 @@
 
 #define WIFI_NAME /*internet*/Acti311
 #define WIFI_PASS /*654qwerty123*/Actimind79Password
-#define SERVER_IP 192.168.101.36/*192.168.0.101*/
+#define SERVER_IP /*192.168.0.100*/192.168.101.36
 #define PORT /*8080*/80
 
 #define BUILD_TYPES_URL "/guestAuth/app/rest/buildTypes/"
@@ -41,7 +41,7 @@
 #define RED_PIN 6
 #define YELLOW_PIN 5
 #define GREEN_PIN 3
-#define DUTY 50 // 0 to 255
+#define DUTY 190 // 0 to 255 (need to test on light traffic)
 #define COEFF_FOR_1SEC 10 // 10 times is 1 sec
 
 #define MODULE_RESET_PIN 2

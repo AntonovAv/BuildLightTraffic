@@ -23,6 +23,8 @@ BuildServerErrorState::~BuildServerErrorState() {
 }
 
 void BuildServerErrorState::process() {
+	Serial.println(F("---BuildServerErrorState---"));
+
 	String request = "/";
 	byte resp = SystemUtils.prepareGetRequest(request, true);
 	
@@ -38,6 +40,9 @@ void BuildServerErrorState::process() {
 		nextState = new ReadIdsState();
 	}
 	else {
+
+		Serial.print(F("Error: ")); Serial.println(resp);
+
 		if (countOfRepeats < MAX_REPEATS) {
 
 			countOfRepeats++;

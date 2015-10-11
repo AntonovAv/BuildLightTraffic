@@ -31,7 +31,8 @@ ReadDataOfIdsState::~ReadDataOfIdsState() {
 }
 
 void ReadDataOfIdsState::process() {
-	
+	Serial.println(F("---ReadDataOfIdsState---"));
+
 	STATE_OF_BUILDS = SUCCESS;
 
 	int currentAddress = SystemUtils.START_EEPROM_ADDRESS_BUILD_IDS;
@@ -69,7 +70,6 @@ void ReadDataOfIdsState::process() {
 
 		nextState = new ReadIdsState();
 
-		Serial.println(STATE_OF_BUILDS);
 		// change light strategy
 		switch (STATE_OF_BUILDS) {
 
@@ -83,6 +83,8 @@ void ReadDataOfIdsState::process() {
 
 	}
 	else {
+		Serial.print(F("Error: ")); Serial.println(resp);
+
 		if (countOfRepeats < MAX_REPEATS) {
 
 			countOfRepeats++;
@@ -97,7 +99,7 @@ void ReadDataOfIdsState::process() {
 }
 
 byte ReadDataOfIdsState::handleID(String id, boolean needConnect) {
-	//String request = "/buildinfo.jsp?id=" + id; // need to change
+	//String request = "/buildinfo.jsp?id=" + id + ",a=1234567890,b=locator,c=information,d=otherdataololoxoxoxoxoxoxoxoxoxoxoxoxoxoxoxoxoxoxoxoxoxoxooxoxoxoxxoxooxxooxoxxo"; // need to change
 	String request = String(F( BUILD_TYPES_URL ));
 	request += String(F( BUILD_STATE_URL ));
 	request.replace(F( ID_PLACEHOLDER ), id);
@@ -126,7 +128,7 @@ byte ReadDataOfIdsState::handleID(String id, boolean needConnect) {
 	DataReader_* dataReader = new DataReader_(false);
 	JSONDataParser_* dataParser = new JSONDataParser_(tokens, 2, lengths);
 
-	int time = 2000; // time for wait while data are reading
+	int time = 1200; // time for wait while data are reading
 	int counter = 0;
 	
 	while (time > 0) {
@@ -144,12 +146,11 @@ byte ReadDataOfIdsState::handleID(String id, boolean needConnect) {
 		delay(1);
 	}
 	Serial.println();
-	
-	boolean success;
+
 	Serial.println("id: " + id);
 	if (dataParser->getLengthOfDataResults()[0] != 2 || dataParser->getLengthOfDataResults()[1] != 2) {
 		Serial.println(F("err read stus"));
-		success = false;
+		responce = READ_STATE_OF_ID_ERROR;
 	}
 	else {
 		/* if first  failure - faild and finish
@@ -172,18 +173,13 @@ byte ReadDataOfIdsState::handleID(String id, boolean needConnect) {
 		Serial.print(" state: "); Serial.println((*dataParser->getResultData()[1][0]));
 		Serial.print("status: "); Serial.print((*dataParser->getResultData()[0][1]));
 		Serial.print(" state: "); Serial.println((*dataParser->getResultData()[1][1]));
-		success = true;
+
+		responce = NO_ERRORS;
 	}
 	
 	/*!important*/
 	delete dataReader;
 	delete dataParser;
 
-	if (success) {
-		return NO_ERRORS;
-	}
-	else {
-		return READ_STATE_OF_ID_ERROR;
-	}
-
+	return responce;
 }

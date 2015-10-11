@@ -23,14 +23,17 @@ ConnectToWiFiState::~ConnectToWiFiState() {
 }
 
 void ConnectToWiFiState::process() {
+	Serial.println(F("---ConnectToWiFiState---"));
+
 	byte responce = SystemUtils.connectToWiFi();
-	Serial.println(responce);
+	
 	if (responce == NO_ERRORS) {
 		delayMs = 1000; // 1 sec if all good
 
 		nextState = new ReadIdsState();
 	}
 	else {
+		Serial.print(F("Error: ")); Serial.println(responce);
 
 		lightStrategy = new WiFiConnectionErrorLightStrategy();
 

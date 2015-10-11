@@ -62,6 +62,6 @@ void setup() {
 
 void loop() {
 
-	Serial.print(F("currentFreeMemory: ")); Serial.println(SystemUtils.freeRam());
+	Serial.print(F("CurrentFreeMemory: ")); Serial.println(SystemUtils.freeRam());
 	system.process();
 }

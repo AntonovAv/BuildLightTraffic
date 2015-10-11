@@ -25,7 +25,7 @@ ReadIdsState::~ReadIdsState() {
 // read ids to eeprom 
 void ReadIdsState::process() {
 
-	Serial.println(F("ReadIds"));
+	Serial.println(F("---ReadIdsState---"));
 
 	byte resp = readIds();
 
@@ -38,6 +38,8 @@ void ReadIdsState::process() {
 		nextState = new ReadDataOfIdsState();
 	}
 	else {
+		Serial.print(F("Error: ")); Serial.println(resp);
+
 		if (countOfRepeats < MAX_REPEATS) {
 			countOfRepeats++;
 			nextState = 0;
@@ -100,21 +102,18 @@ byte ReadIdsState::readIds() {
 	if (dataParser->getLengthOfDataResults()[1] != idsInResponce) {
 		// error
 		success = false;
+		responce = READ_CONFIG_IDS_ERROR;
 	}
 	else {
 		SystemUtils.updateBuildsIdsInEEPROM(dataParser->getResultData()[1], dataParser->getLengthOfDataResults()[1]); // write ids to eeprom
 		success = true;
+		responce = NO_ERRORS;
 	}
 
 	// !important
 	delete dataParser;
 	delete dataReader;
 
-	if (success) {
-		return NO_ERRORS;
-	}
-	else {
-		return READ_CONFIG_IDS_ERROR;
-	}
+	return responce;
 }
 

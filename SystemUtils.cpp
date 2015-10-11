@@ -7,7 +7,7 @@
 
 String SystemUtils_::execCommand(const String& command, int pause, boolean needReturn) {
 	// debug output:
-	//Serial.println("<s>" + command + "</s>");
+	Serial.println("<s>" + command + "</s>");
 	Serial1.print(command);
 	if (needReturn) {
 		Serial1.setTimeout(pause);
