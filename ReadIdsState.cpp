@@ -33,7 +33,7 @@ void ReadIdsState::process() {
 
 	if (resp == NO_ERRORS ) {
 
-		delayMs = 5000; // if all good 
+		delayMs = 1000; // if all good 
 
 		nextState = new ReadDataOfIdsState();
 	}
@@ -74,7 +74,7 @@ byte ReadIdsState::readIds() {
 	DataReader_* dataReader = new DataReader_(false);
 	JSONDataParser_* dataParser = new JSONDataParser_(tokens, 2, lengths);
 
-	int time = 5000; // time for wait while data are reading
+	int time = 2500; // time for wait while data are reading (5000)
 	while (time > 0) {
 		while (Serial1.available() > 0) {
 			char c = Serial1.read();

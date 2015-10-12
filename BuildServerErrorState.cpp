@@ -8,7 +8,7 @@
 #include "ReadIdsState.h"
 
 BuildServerErrorState::BuildServerErrorState() {
-	MAX_REPEATS = 10;
+	MAX_REPEATS = 5;
 
 	delayMs = 5000; //5 sec default
 	
@@ -37,7 +37,12 @@ void BuildServerErrorState::process() {
 
 	if (resp == NO_ERRORS) {
 		delayMs = 2000; // if all good
+
+		lightStrategy = 0;
+
 		nextState = new ReadIdsState();
+
+		return;
 	}
 	else {
 
@@ -47,12 +52,16 @@ void BuildServerErrorState::process() {
 
 			countOfRepeats++;
 			nextState = 0;
+
+			return;
 		}
 		else {
 
 			lightStrategy = new BuildServerErrorLightStrategy();
 
 			nextState = new ResetModuleState();
+
+			return;
 		}
 	}
 }

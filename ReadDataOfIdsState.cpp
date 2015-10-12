@@ -128,7 +128,7 @@ byte ReadDataOfIdsState::handleID(String id, boolean needConnect) {
 	DataReader_* dataReader = new DataReader_(false);
 	JSONDataParser_* dataParser = new JSONDataParser_(tokens, 2, lengths);
 
-	int time = 1200; // time for wait while data are reading
+	int time = 1000; // time for wait while data are reading (1200)
 	int counter = 0;
 	
 	while (time > 0) {

@@ -30,7 +30,10 @@ void ConnectToWiFiState::process() {
 	if (responce == NO_ERRORS) {
 		delayMs = 1000; // 1 sec if all good
 
+		lightStrategy = 0;
+
 		nextState = new ReadIdsState();
+		return;
 	}
 	else {
 		Serial.print(F("Error: ")); Serial.println(responce);
@@ -39,9 +42,11 @@ void ConnectToWiFiState::process() {
 
 		if (countOfRepeats < MAX_REPEATS) {
 			nextState = 0;
+			return;
 		}
 		else {
 			nextState = new ResetModuleState();
+			return;
 		}
 	}
 }

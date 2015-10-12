@@ -41,7 +41,7 @@
 #define RED_PIN 6
 #define YELLOW_PIN 5
 #define GREEN_PIN 3
-#define DUTY 190 // 0 to 255 (need to test on light traffic)
+#define DUTY 255 // 0 to 255 (need to test on light traffic)
 #define COEFF_FOR_1SEC 10 // 10 times is 1 sec
 
 #define MODULE_RESET_PIN 2
