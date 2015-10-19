@@ -121,12 +121,12 @@ byte ReadDataOfIdsState::handleID(String id, boolean needConnect) {
 	Serial.println(buffer);
 	Serial.println(F("Sended get end "));*/
 	
-
-	String tokens[2] = { F("status") , F("state") };
-	byte lengths[2] = { 2, 2 };  
+	
+	String tokens[3] = { F("status") , F("state"), F("count") };
+	byte lengths[3] = { 2, 2, 1 };
 
 	DataReader_* dataReader = new DataReader_(false);
-	JSONDataParser_* dataParser = new JSONDataParser_(tokens, 2, lengths);
+	JSONDataParser_* dataParser = new JSONDataParser_(tokens, 3, lengths);
 
 	int time = 1000; // time for wait while data are reading (1200)
 	int counter = 0;
@@ -148,34 +148,48 @@ byte ReadDataOfIdsState::handleID(String id, boolean needConnect) {
 	Serial.println();
 
 	Serial.println("id: " + id);
-	if (dataParser->getLengthOfDataResults()[0] != 2 || dataParser->getLengthOfDataResults()[1] != 2) {
+
+	byte countValue = 0; // if for config there is info for only one build
+
+	if (dataParser->getLengthOfDataResults()[2] != 1) {
 		Serial.println(F("err read stus"));
 		responce = READ_STATE_OF_ID_ERROR;
 	}
 	else {
-		/* if first  failure - faild and finish
-		   if second - failure, and current - runnig - Faild and finish and read other configs
-		*/
-		if ((*dataParser->getResultData()[0][0]).equalsIgnoreCase(F("FAILURE"))) {
-			STATE_OF_BUILDS = FAILED;
+		countValue = dataParser->getResultData()[2][0]->toInt();
+
+		if (dataParser->getLengthOfDataResults()[0] != countValue || dataParser->getLengthOfDataResults()[1] != countValue) {
+			Serial.println(F("err read stus"));
+			responce = READ_STATE_OF_ID_ERROR;
 		}
 		else {
-			// if faild and running
-			if ((*dataParser->getResultData()[0][1]).equalsIgnoreCase(F("FAILURE"))) {
-				if ((*dataParser->getResultData()[1][0]).equalsIgnoreCase(F("running"))) {
-					if (STATE_OF_BUILDS != FAILED) {
-						STATE_OF_BUILDS = FAILED_AND_RUNNING;
+			/* if first  failure - faild and finish
+			if second - failure, and current - runnig - Faild and finish and read other configs
+			*/
+			if ((*dataParser->getResultData()[0][0]).equalsIgnoreCase(F("FAILURE"))) {
+				STATE_OF_BUILDS = FAILED;
+			}
+			else {
+				// if faild and running and countValue is 2
+				if ( 2 == countValue && (*dataParser->getResultData()[0][1]).equalsIgnoreCase(F("FAILURE"))) {
+					if ((*dataParser->getResultData()[1][0]).equalsIgnoreCase(F("running"))) {
+						if (STATE_OF_BUILDS != FAILED) {
+							STATE_OF_BUILDS = FAILED_AND_RUNNING;
+						}
 					}
 				}
 			}
+			Serial.print("status: "); Serial.print((*dataParser->getResultData()[0][0]));
+			Serial.print(" state: "); Serial.println((*dataParser->getResultData()[1][0]));
+			if (2 == countValue) {
+				Serial.print("status: "); Serial.print((*dataParser->getResultData()[0][1]));
+				Serial.print(" state: "); Serial.println((*dataParser->getResultData()[1][1]));
+			}
+			
+			responce = NO_ERRORS;
 		}
-		Serial.print("status: "); Serial.print((*dataParser->getResultData()[0][0]));
-		Serial.print(" state: "); Serial.println((*dataParser->getResultData()[1][0]));
-		Serial.print("status: "); Serial.print((*dataParser->getResultData()[0][1]));
-		Serial.print(" state: "); Serial.println((*dataParser->getResultData()[1][1]));
-
-		responce = NO_ERRORS;
 	}
+	
 	
 	/*!important*/
 	delete dataReader;
