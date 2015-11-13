@@ -29,6 +29,9 @@
 
 #define READ_STATE_OF_ID_ERROR 41
 
+#define TIME_OUT_ERROR 51
+#define CONNECTION_TIME_OUT 10000 // 10 sec
+
 #define WIFI_NAME /*internet*/Acti311
 #define WIFI_PASS /*654qwerty123*/Actimind79Password
 #define SERVER_IP /*192.168.0.100*/192.168.101.36
@@ -41,7 +44,11 @@
 #define RED_PIN 6
 #define YELLOW_PIN 5
 #define GREEN_PIN 3
-#define DUTY 255 // 0 to 255 (need to test on light traffic)
+
+// 0 to 255 (need to dimming light traffic)
+#define DUTY_RED 245
+#define DUTY_YELLOW 245
+#define DUTY_GREEN 231 
 #define COEFF_FOR_1SEC 10 // 10 times is 1 sec
 
 #define MODULE_RESET_PIN 2

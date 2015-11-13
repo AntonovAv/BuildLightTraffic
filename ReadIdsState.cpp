@@ -33,7 +33,7 @@ void ReadIdsState::process() {
 
 	if (resp == NO_ERRORS ) {
 
-		delayMs = 1000; // if all good 
+		delayMs = 1; // if all good 
 
 		nextState = new ReadDataOfIdsState();
 	}
@@ -74,21 +74,36 @@ byte ReadIdsState::readIds() {
 	DataReader_* dataReader = new DataReader_(false);
 	JSONDataParser_* dataParser = new JSONDataParser_(tokens, 2, lengths);
 
-	int time = 2500; // time for wait while data are reading (5000)
+	int time = CONNECTION_TIME_OUT; 
+
+	boolean breaker = false;
+
 	while (time > 0) {
 		while (Serial1.available() > 0) {
 			char c = Serial1.read();
 			c = dataReader->handleNextChar(c);
-
-			if (-1 != c) {
+			if (END_OF_DATA_CHAR == c) {
+				breaker = true;
+				break;
+			}
+			if (SKIP_CHAR != c) {
 				dataParser->parseNextChar(c);
 			}
+		}
+		if (true == breaker) {
+			break;
 		}
 		time -= 1;
 		delay(1);
 	}
 
-
+	if (false == breaker) {
+		Serial.println(F("Connection timeout"));
+		responce = CONNECTION_TIME_OUT;
+	}
+	else {
+		Serial1.find("OK"); // clear buffer
+	}
 	// read "count"
 	byte idsInResponce;
 	boolean success = false;

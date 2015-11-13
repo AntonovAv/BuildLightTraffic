@@ -128,23 +128,38 @@ byte ReadDataOfIdsState::handleID(String id, boolean needConnect) {
 	DataReader_* dataReader = new DataReader_(false);
 	JSONDataParser_* dataParser = new JSONDataParser_(tokens, 3, lengths);
 
-	int time = 1000; // time for wait while data are reading (1200)
-	int counter = 0;
+	int time = CONNECTION_TIME_OUT; // time for wait while data are reading (1200)
 	
+	boolean breaker = false;
+
 	while (time > 0) {
 		while (Serial1.available() > 0) {
 			
 			char c = Serial1.read();
-			Serial.print(c);
 			c = dataReader->handleNextChar(c);
-			if (-1 != c) {
+			if (END_OF_DATA_CHAR == c) {
+				breaker = true;
+				break; // leave inner loop
+			}
+			if (SKIP_CHAR != c) {
 				
 				dataParser->parseNextChar(c);
 			}
 		}
+		if (true == breaker) {
+			break; // leave outer looop
+		}
 		time -= 1;
 		delay(1);
 	}
+	if (false == breaker) {
+		Serial.println(F("Connection timeout"));
+		responce = CONNECTION_TIME_OUT;
+	}
+	else {
+		Serial1.find("OK"); // clear buffer
+	}
+	
 	Serial.println();
 
 	Serial.println("id: " + id);

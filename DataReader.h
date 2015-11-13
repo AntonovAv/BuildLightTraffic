@@ -9,6 +9,9 @@
 	#include "WProgram.h"
 #endif
 
+#define END_OF_DATA_CHAR -2
+#define SKIP_CHAR -1
+
 class DataReader_ {
 public:
 
@@ -49,6 +52,7 @@ private:
 	String CHUNKED_TEMPLATE = "chunked";
 	String IPD_COM_TEMPLATE = "+IPD,";
 	String END_OF_HEADER_TEMPLATE = "\r\n\r\n";
+	String CONTENT_LEN_TEMPLATE = "Content - Length: ";
 	
 	int char_count; // temp counter when need to find string
 
@@ -56,6 +60,8 @@ private:
 	int data_len;
 	String chunked_data_len_not_parse; // len of data if chuncked encoding
 	int chunked_data_len;
+	
+	int content_length; // need for count of content length if encoding not chuncked
 };
 
 #endif

@@ -45,7 +45,7 @@ char DataReader_::handleNextCharWithIPD(char &c) {
 		}
 		break;
 	}
-	return -1;
+	return SKIP_CHAR;
 }
 
 char DataReader_::handleNextCharWithChunked(char &c) {
@@ -57,6 +57,9 @@ char DataReader_::handleNextCharWithChunked(char &c) {
 			chunked_data_len = hexToDec(chunked_data_len_not_parse); // convert lenght to int
 			chunked_data_len_not_parse = "";
 			chunkedState = READ_CHUNKED_DATA;
+			if (chunked_data_len == 0) {
+				return END_OF_DATA_CHAR;
+			}
 		}
 		else {
 			chunked_data_len_not_parse += c;
@@ -76,13 +79,13 @@ char DataReader_::handleNextCharWithChunked(char &c) {
 		}
 		break;
 	}
-	return -1;
+	return SKIP_CHAR;
 }
 
 char DataReader_::handleNextChar(char &c) {
 	c = handleNextCharWithIPD(c);
-	if (-1 == c) {
-		return -1;
+	if (SKIP_CHAR == c) {
+		return SKIP_CHAR;
 	}
 
 	if (false == isReadHeader) { // if not read header
@@ -95,6 +98,16 @@ char DataReader_::handleNextChar(char &c) {
 				if ((*tempHeader).indexOf(CHUNKED_TEMPLATE) != -1) {
 					isChunked = true;
 					chunkedState = READ_CHUNKED_LEN;
+				} else {
+					// if not chuncked - read content length
+					char ind = (*tempHeader).indexOf(CONTENT_LEN_TEMPLATE);
+					ind += CONTENT_LEN_TEMPLATE.length();
+					String cont_len_not_parse = "";
+					while ((*tempHeader).charAt(ind) != '\r') {
+						cont_len_not_parse += (*tempHeader).charAt(ind);
+						ind++;
+					}
+					content_length = cont_len_not_parse.toInt();
 				}
 
 				if (!saveHeader && tempHeader != 0) { // fix?!
@@ -117,10 +130,14 @@ char DataReader_::handleNextChar(char &c) {
 			return handleNextCharWithChunked(c);
 		}
 		else {
+			content_length--;
+			if (content_length <= 0) {
+				return END_OF_DATA_CHAR;
+			}
 			return c; // data if encoding is not chunked
 		}
 	}
-	return -1;
+	return SKIP_CHAR;
 }
 
 unsigned int DataReader_::hexToDec(String &hexString) {
@@ -150,6 +167,7 @@ void DataReader_::initRead(boolean isNeedHeader) {
 	state = FIND_LEN;
 	data_len = 0;
 	chunked_data_len = 0;
+	content_length = 0;
 	tempHeader = new String;
 }
 
