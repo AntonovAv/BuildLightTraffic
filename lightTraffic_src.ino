@@ -21,9 +21,9 @@
 #include <TimerOne.h>
 #include <eeprom.h>
 
-#define RED 6
-#define YELLOW 5
-#define GREEN 3
+#define RED 11
+#define YELLOW 10
+#define GREEN 9
 
 #define RED_MASK 1
 #define RED_BLINK_MASK 2
@@ -44,10 +44,9 @@ void light() {
 }
 
 void setup() {
-  // put your setup code here, to run once:
-  pinMode(RED, OUTPUT);
-  pinMode(YELLOW, OUTPUT);
-  pinMode(GREEN, OUTPUT);
+  //pinMode(RED, OUTPUT);
+  //pinMode(YELLOW, OUTPUT);
+  //pinMode(GREEN, OUTPUT);
   pinMode(ESP_RESET, OUTPUT);
   Serial.begin(115200);
   //while (!Serial) {}

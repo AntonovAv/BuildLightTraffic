@@ -41,9 +41,9 @@
 #define BUILD_STATE_URL "id:#/builds/?locator=count:2,running:any"
 #define ID_PLACEHOLDER "#"
 
-#define RED_PIN 6
-#define YELLOW_PIN 5
-#define GREEN_PIN 3
+#define RED_PIN 11
+#define YELLOW_PIN 10
+#define GREEN_PIN 9
 
 // 0 to 255 (need to dimming light traffic)
 #define DUTY_RED 245

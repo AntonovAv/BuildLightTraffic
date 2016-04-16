@@ -81,10 +81,10 @@ int SystemUtils_::updateBuildsIdsInEEPROM(String** ids, byte len) {
 	return currentAddress;
 }
 
-int SystemUtils_::readFromEEPROMToString(int start, char ch, String& buff) {
+int SystemUtils_::readFromEEPROMToString(int start, char delim, String& buff) {
 	int currentAddr = start;
 	char c = EEPROM.read(currentAddr++);
-	while (c != ch) {
+	while (c != delim) {
 		buff += c;
 		c = EEPROM.read(currentAddr++);
 	}
@@ -97,8 +97,8 @@ void SystemUtils_::readBuildIdsFromEEPROM() {
 	String temp;
 	for (int i = 0; i < len; i++) {
 		currentAddr = readFromEEPROMToString(currentAddr, 0, temp);
-		Serial.println("EEPROM: " + temp);
+		Serial.print(F("EEPROM: "));Serial.println(temp);
 		temp = "";
-		Serial.println("curAddr: " + String(currentAddr));
+		Serial.print(F("curAddr: "));Serial.println(String(currentAddr));
 	}
 }
