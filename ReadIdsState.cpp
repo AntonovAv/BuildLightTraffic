@@ -54,7 +54,6 @@ void ReadIdsState::process() {
 
 byte ReadIdsState::readIds() {
 	
-	//String request = "/builds.jsp";
 	String request = String(F( BUILD_TYPES_URL ) );
 
 	byte responce = SystemUtils.prepareGetRequest(request, true); // need to change

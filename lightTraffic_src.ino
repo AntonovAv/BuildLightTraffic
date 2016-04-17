@@ -44,15 +44,17 @@ void light() {
 }
 
 void setup() {
-  //pinMode(RED, OUTPUT);
-  //pinMode(YELLOW, OUTPUT);
-  //pinMode(GREEN, OUTPUT);
   pinMode(ESP_RESET, OUTPUT);
   Serial.begin(115200);
   //while (!Serial) {}
   Serial.println("Hello");
   Serial1.begin(115200);
   Timer1.initialize(1000000/COEFF_FOR_1SEC); // 1 sec/COEFF sec
+  
+  Timer1.pwm(RED_PIN, 0);
+  Timer1.pwm(YELLOW_PIN, 0);
+  Timer1.pwm(GREEN_PIN, 0);
+  
   //Timer1.stop();
   Timer1.attachInterrupt(light);
 

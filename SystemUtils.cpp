@@ -30,7 +30,6 @@ byte SystemUtils_::prepareGetRequest(String& request, boolean needConnect) {
 	}
 	
 	request = "GET " + request + " HTTP/1.1\r\nHOST: " xstr(SERVER_IP) "\r\nAccept: application/json\r\n\r\n";
-	//request = ("GET " + request + " HTTP/1.1\r\nHOST: " xstr(SERVER_IP) "\r\n\r\n");
 	resp = execCommand("AT+CIPSEND=" + String(request.length()) + "\r\n");
 
 	if (resp.indexOf(">") == -1) {
@@ -42,7 +41,6 @@ byte SystemUtils_::prepareGetRequest(String& request, boolean needConnect) {
 
 byte SystemUtils_::connectToWiFi() {
 	if (execCommand(F("AT+CWJAP=\"" xstr(WIFI_NAME) "\",\""  xstr(WIFI_PASS) "\"\r\n"), 10000).indexOf(F("OK")) == -1) {
-		//Serial.println(Serial1.readString());
 		return WIFI_CONNECTION_ERROR;
 	}
 	return NO_ERRORS;

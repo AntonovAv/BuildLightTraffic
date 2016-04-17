@@ -9,6 +9,7 @@
 	#include "WProgram.h"
 #endif
 
+#include <TimerOne.h>
 #include "SystemUtils.h"
 
 class BasicLightStrategy {

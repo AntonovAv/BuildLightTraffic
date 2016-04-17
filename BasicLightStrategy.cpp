@@ -7,22 +7,22 @@
 
 void BasicLightStrategy::leds(boolean r, boolean y, boolean g) {
 	if (r) {
-		analogWrite(RED_PIN, DUTY_RED);
+		Timer1.setPwmDuty(RED_PIN, DUTY_RED);
 	}
 	else {
-		analogWrite(RED_PIN, 0);
+		Timer1.setPwmDuty(RED_PIN, 0);
 	}
 	if (y) {
-		analogWrite(YELLOW_PIN, DUTY_YELLOW);
+		Timer1.setPwmDuty(YELLOW_PIN, DUTY_YELLOW);
 	}
 	else {
-		analogWrite(YELLOW_PIN, 0);
+		Timer1.setPwmDuty(YELLOW_PIN, 0);
 	}
 	if (g) {
-		analogWrite(GREEN_PIN, DUTY_GREEN);
+		Timer1.setPwmDuty(GREEN_PIN, DUTY_GREEN);
 	}
 	else {
-		analogWrite(GREEN_PIN, 0);
+		Timer1.setPwmDuty(GREEN_PIN, 0);
 	}
 	
 }
